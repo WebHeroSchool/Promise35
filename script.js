@@ -27,7 +27,7 @@ let getDate = new Promise((resolve, reject) => {
 let init = (json) => {
 	avatar = json.avatar_url;
 	name = json.name;
-	bio = json.bio;
+	description = json.bio;
 	url = json.url;
 }
 
@@ -65,24 +65,26 @@ let addDate = () => {
 	body.appendChild(currentDate);
 }
 
-let hidePreload = () => {
+let hidePreloader = () => {
 	let preloader = document.getElementById('preloader');
 	preloader.style.display = 'none';
 }
 
 Promise.all([getName, getDate])
-	.then(([name, date]) => fetch(`${name}${date}`))
+	.then(([name, date]) => {
 		savedDate = date;
 		profileName = name;
+		return fetch('https://api.github.com/users/' + name);
+	})
 	.then(res => res.json())
 	.then(json => {
 		init(json);
+		hidePreloader();
+		addDate();
+		addName();
 		addDescription();
 		addAvatar();
 		addUrl();
-		addDate();
-		addName();
-		hidePreload();
 	})
 
     .catch(err => alert(err + 'Элемент не найден'));  
