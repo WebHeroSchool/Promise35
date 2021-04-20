@@ -7,6 +7,7 @@ let savedDate;
 let profileName;
 
 
+
 let getName = new Promise((resolve, reject) => {
 	setTimeout(() => {
 		let url = window.location.toString();
@@ -21,8 +22,9 @@ let getDate = new Promise((resolve, reject) => {
 		let date = new Date();
 		resolve(date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear());
 	}, 2000);
-});//переменная nowDate ограничена областью видимости функции getNowDate
+});
 
+let preloader = document.getElementById('preloader');
 
 let init = (json) => {
 	avatar = json.avatar_url;
@@ -60,31 +62,26 @@ let addUrl = () => {
 }
 
 let addDate = () => {
-	let currentDate = document.createElement('h2');
+	let currentDate = document.createElement('p');
 	currentDate.innerHTML = savedDate;
 	body.appendChild(currentDate);
-}
-
-let hidePreloader = () => {
-	let preloader = document.getElementById('preloader');
-	preloader.style.display = 'none';
 }
 
 Promise.all([getName, getDate])
 	.then(([name, date]) => {
 		savedDate = date;
 		profileName = name;
+		preloader.style.display = 'none';
 		return fetch('https://api.github.com/users/' + name);
 	})
 	.then(res => res.json())
 	.then(json => {
 		init(json);
-		hidePreloader();
 		addDate();
 		addName();
 		addDescription();
 		addAvatar();
 		addUrl();
-	})
-
+	})	
+	
     .catch(err => alert(err + 'Элемент не найден'));  
